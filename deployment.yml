@@ -1,0 +1,41 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: exampleservice
+spec:
+  selector:
+    app: myapp
+  ports:
+    - protocol: "TCP"
+      # port accessible inside cluster
+      port: 8081
+      # port to forward to inside thte pod
+      targetPort: 8080
+      # port accessibel outside cluster
+      nodePort: 30002
+  type: LoadBalancer
+
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myappdeployment
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  replicas: 5
+  template:
+    metadata:
+      labels:
+          # it's bound with selector -> app
+        app: myapp
+    spec:
+      containers:
+        - name: myapp
+          image: 020390/exampleapp:v1.0.0
+          ports:
+            - containerPort: 8080
